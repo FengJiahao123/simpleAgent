@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Knowledge Notes</title>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #1a1a2e; color: #d1d5db; padding: 20px; max-width: 900px; margin: 0 auto;
+  }
+  h1 { color: #e94560; margin-bottom: 4px; }
+  .subtitle { color: #666; font-size: 13px; margin-bottom: 20px; }
+  .back { color: #4ecca3; text-decoration: none; font-size: 13px; display: inline-block; margin-bottom: 16px; }
+  .back:hover { text-decoration: underline; }
+
+  .note-card {
+    background: #16213e; border: 1px solid #0f3460; border-radius: 10px;
+    padding: 20px 24px; margin-bottom: 16px; line-height: 1.7;
+  }
+  .note-card .meta {
+    font-size: 12px; color: #666; margin-bottom: 12px; padding-bottom: 10px;
+    border-bottom: 1px solid #0f3460;
+  }
+  .note-card .meta .tag { color: #f0c040; margin-right: 6px; }
+  .note-card .meta .source { color: #4ecca3; }
+  .note-card .id { font-family: monospace; color: #555; font-size: 11px; }
+
+  .note-content h1,.note-content h2,.note-content h3 { color: #f0c040; margin: 12px 0 6px; }
+  .note-content h2 { font-size: 18px; }
+  .note-content h3 { font-size: 15px; }
+  .note-content p { margin: 6px 0; }
+  .note-content ul,.note-content ol { margin: 6px 0; padding-left: 22px; }
+  .note-content li { margin: 3px 0; }
+  .note-content code {
+    background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 3px;
+    font-family: "Consolas", "Courier New", monospace; font-size: 13px; color: #4ecca3;
+  }
+  .note-content pre {
+    background: rgba(0,0,0,0.3); padding: 12px 16px; border-radius: 6px;
+    overflow-x: auto; font-size: 13px; margin: 8px 0; line-height: 1.5;
+  }
+  .note-content pre code { background: none; padding: 0; color: #d1d5db; }
+  .note-content blockquote {
+    border-left: 3px solid #e94560; padding-left: 12px; color: #aaa; margin: 8px 0;
+  }
+  .note-content a { color: #4ecca3; }
+  .note-content strong { color: #fff; }
+  .note-content table { border-collapse: collapse; margin: 8px 0; width: 100%; }
+  .note-content th, .note-content td { border: 1px solid #1a1a2e; padding: 6px 10px; font-size: 13px; text-align: left; }
+  .note-content th { background: #0f3460; }
+
+  .empty { color: #666; text-align: center; padding: 60px 0; }
+  .file-link { font-family: monospace; color: #4ecca3; font-size: 12px; display: block; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+  <a href="/" class="back">&larr; Back to Chat</a>
+  <h1>Knowledge Notes</h1>
+  <div class="subtitle" id="subtitle">Loading...</div>
+  <div id="notesContainer"><div class="empty">Loading notes...</div></div>
+
+<script>
+marked.setOptions({ breaks: true, gfm: true });
+
+function getSid() {
+  const path = window.location.pathname;
+  return path.split("/").pop();
+}
+
+async function load() {
+  const sid = getSid();
+  document.getElementById("subtitle").textContent = "Session: " + sid;
+
+  const res = await fetch("/api/notes/" + sid);
+  const notes = await res.json();
+
+  const container = document.getElementById("notesContainer");
+  if (!notes.length) {
+    container.innerHTML = '<div class="empty">No notes yet. <a href="/">Go chat</a> and ask the agent to research something.</div>';
+    return;
+  }
+
+  // List .md files
+  let mdFilesHtml = "";
+  try {
+    const fres = await fetch("/api/notes/" + sid + "/files");
+    const files = await fres.json();
+    if (files.length) {
+      mdFilesHtml = '<div style="margin-bottom:20px;padding:10px;background:#16213e;border-radius:6px;font-size:13px;">';
+      mdFilesHtml += '<strong style="color:#f0c040;">Exported .md Files</strong> (in <code>data/notes/' + escapeHtml(sid) + '/</code>):<br>';
+      files.forEach(f => {
+        mdFilesHtml += '<a class="file-link" href="/notes-files/' + escapeHtml(sid) + '/' + f + '" target="_blank"> ' + escapeHtml(f) + '</a>';
+      });
+      mdFilesHtml += '</div>';
+    }
+  } catch(e) {}
+
+  const cardsHtml = notes.map(n => {
+    const meta = [];
+    if (n.tags && n.tags.length) meta.push(n.tags.map(t => '<span class="tag">#' + escapeHtml(t) + '</span>').join(" "));
+    if (n.source_url) meta.push('<a class="source" href="' + escapeHtml(n.source_url) + '" target="_blank">Source</a>');
+    if (n.created_at) meta.push('<span>' + escapeHtml(n.created_at.substring(0,10)) + '</span>');
+
+    return '<div class="note-card">' +
+      '<div class="meta">' +
+      '<span class="id">' + escapeHtml(n.id) + '</span> &middot; ' +
+      meta.join(" &middot; ") +
+      '</div>' +
+      '<div class="note-content">' + marked.parse(n.content) + '</div>' +
+      '</div>';
+  }).join("");
+
+  container.innerHTML = mdFilesHtml + cardsHtml;
+}
+
+function escapeHtml(text) {
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+load();
+</script>
+</body>
+</html>
