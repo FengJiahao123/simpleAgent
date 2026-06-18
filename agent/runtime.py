@@ -31,6 +31,7 @@ SYSTEM_PROMPT = """You are a professional knowledge base assistant. Your job is 
 | summarize | Condense long text |
 | calculator | Math calculations |
 | translate | Translate between languages |
+| export_doc | Export content as a file (md, docx, txt, html) |
 
 ## Critical: Note Quality Rules
 When using save_note, you MUST produce a DETAILED, WELL-STRUCTURED note. A good note includes:

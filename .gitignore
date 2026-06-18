@@ -6,6 +6,8 @@ data/sessions/*.json
 data/notes/*.md
 data/notes/*/
 !data/notes/.gitkeep
+data/exports/*
+!data/exports/.gitkeep
 .pytest_cache/
 .idea/
 TESTING_GUIDE.md

@@ -18,6 +18,7 @@ from tools.web_search import WebSearch
 from tools.notes import SaveNote, SearchNotes, export_all_notes_to_md, NOTES_DIR
 from tools.summarize import Summarize
 from tools.translate import Translate
+from tools.export_doc import ExportDoc
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -32,6 +33,7 @@ registry.register(SaveNote())
 registry.register(SearchNotes())
 registry.register(Summarize(llm_client=llm_client))
 registry.register(Translate(llm_client=llm_client))
+registry.register(ExportDoc())
 session_manager = SessionManager()
 runtime = AgentRuntime(llm_client=llm_client, tool_registry=registry, max_steps=10)
 

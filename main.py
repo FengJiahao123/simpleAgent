@@ -42,6 +42,7 @@ def build_runtime():
     from tools.notes import SaveNote, SearchNotes
     from tools.summarize import Summarize
     from tools.translate import Translate
+    from tools.export_doc import ExportDoc
 
     try:
         llm_client = LLMClient()
@@ -58,6 +59,7 @@ def build_runtime():
     registry.register(SearchNotes())
     registry.register(Summarize(llm_client=llm_client))
     registry.register(Translate(llm_client=llm_client))
+    registry.register(ExportDoc())
 
     session_manager = SessionManager()
     runtime = AgentRuntime(llm_client=llm_client, tool_registry=registry, max_steps=10)
