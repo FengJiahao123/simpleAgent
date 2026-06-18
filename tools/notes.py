@@ -172,8 +172,8 @@ class SearchNotes(Tool):
         output = f"Found {len(top)} matching note(s) for '{query}':\n\n"
         for i, (note, _score) in enumerate(top, 1):
             tags_str = f" [{', '.join(note.tags)}]" if note.tags else ""
-            # Show more content since notes are now detailed
-            output += f"{i}.{tags_str}\n{note.content[:500]}\n"
+            output += f"{i}. [ID: {note.id}]{tags_str}\n"
+            output += f"{note.content}\n"  # Full content
             if note.source_url:
                 output += f"   Source: {note.source_url}\n"
             output += "\n"
