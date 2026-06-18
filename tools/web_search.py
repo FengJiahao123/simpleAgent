@@ -1,6 +1,6 @@
 from tools.base import Tool
 
-# Mock knowledge base: pre-defined search results
+# Mock knowledge base
 _MOCK_KNOWLEDGE = {
     "python": [
         "Python Official Documentation — Comprehensive guide to Python language features, standard library, and best practices.",
@@ -14,21 +14,62 @@ _MOCK_KNOWLEDGE = {
     ],
     "transformer": [
         "Attention Is All You Need (Vaswani et al., 2017) — The original Transformer paper introducing self-attention mechanism.",
-        "Transformer 架构的核心是自注意力机制（Self-Attention），计算公式为 Attention(Q,K,V) = softmax(QK^T/√d_k)V。多头注意力通过并行计算多个注意力头来捕捉不同子空间的信息。位置编码（Positional Encoding）使用正弦和余弦函数为序列添加位置信息。",
+        "Transformer architecture: Encoder-decoder structure. Self-Attention formula: Attention(Q,K,V) = softmax(QK^T/sqrt(d_k))V. Multi-Head Attention runs h parallel attention heads, each with dimension d_k = d_model/h. Positional Encoding uses sine/cosine functions. Layer Normalization and Residual Connections after each sub-layer.",
         "The Illustrated Transformer by Jay Alammar — Visual guide explaining Transformer architecture step by step.",
+    ],
+    "attention": [
+        "Self-Attention mechanism: Given input sequence X, compute Query=W_Q·X, Key=W_K·X, Value=W_V·X. Output is weighted sum of Values, weights determined by softmax(QK^T / sqrt(d_k)). Multiple heads capture different subspace relationships.",
+        "Multi-Head Attention: Concat(head_1, ..., head_h)W_O where each head_i = Attention(Q·W_i^Q, K·W_i^K, V·W_i^V). Typical values: h=8, d_k=d_model/h=64.",
+        "FlashAttention (Dao et al., 2022) — IO-aware attention algorithm achieving 2-4x speedup by reducing memory reads/writes.",
+    ],
+    "deep learning": [
+        "Neural Networks: Layers of neurons with activation functions (ReLU, sigmoid, tanh). Training via backpropagation and gradient descent.",
+        "CNN (Convolutional Neural Networks): Specialized for grid-like data. Uses convolution, pooling, and fully-connected layers. Key architectures: ResNet, VGG, Inception.",
+        "RNN/LSTM/GRU: Recurrent architectures for sequential data. LSTM uses forget/input/output gates to control information flow. GRU is a simplified variant with 2 gates.",
     ],
     "web development": [
         "MDN Web Docs — Mozilla's comprehensive reference for HTML, CSS, and JavaScript APIs.",
         "React Official Documentation — Guides for building user interfaces with React components and hooks.",
         "Flask Web Framework — Lightweight Python web framework for building APIs and web applications.",
     ],
-    "attention mechanism": [
-        "自注意力机制：对于输入序列 X，通过三个权重矩阵 W_Q、W_K、W_V 分别生成 Query、Key、Value。每个位置的输出是所有位置 Value 的加权和，权重由 Query 和 Key 的点积经过 softmax 归一化得到。多头注意力将这个过程重复 h 次，最后拼接结果。",
-        "FlashAttention (Dao et al., 2022) — IO-aware attention algorithm that reduces memory reads/writes, achieving 2-4x speedup.",
-    ],
     "deepseek": [
-        "DeepSeek-V3 — A strong Mixture-of-Experts (MoE) language model with 671B total parameters, 37B activated per token.",
+        "DeepSeek-V3 — A strong Mixture-of-Experts (MoE) language model with 671B total parameters, 37B activated per token. Supports 128K context window.",
         "DeepSeek-R1 — Reasoning model that uses reinforcement learning to improve chain-of-thought reasoning capabilities.",
+    ],
+    "language model": [
+        "Large Language Models (LLMs): Transformer-based models trained on massive text corpora. Key examples: GPT-4, Claude, DeepSeek, LLaMA, Gemini.",
+        "LLM Training Process: Pre-training (next-token prediction on web-scale data) → Supervised Fine-Tuning (instruction following) → RLHF/DPO (alignment with human preferences).",
+        "Scaling Laws: Model performance improves predictably with more compute, data, and parameters (Kaplan et al., 2020; Chinchilla, 2022).",
+    ],
+    "reinforcement learning": [
+        "Reinforcement Learning: Agent learns by interacting with environment, receiving rewards for good actions. Key concepts: state, action, reward, policy, value function.",
+        "RLHF (Reinforcement Learning from Human Feedback): Train a reward model from human preference data, then optimize LLM policy via PPO against the reward model.",
+        "Key Algorithms: Q-Learning, Policy Gradient, Actor-Critic (A2C/A3C), PPO, DQN, SAC.",
+    ],
+    "natural language processing": [
+        "NLP Pipeline: Tokenization → Embedding → Encoding → Task-specific head. Modern approach uses pre-trained Transformer models fine-tuned for downstream tasks.",
+        "Key NLP Tasks: Text classification, named entity recognition (NER), question answering, machine translation, summarization, sentiment analysis.",
+        "Word Embeddings: Word2Vec, GloVe. Modern contextual embeddings: BERT, GPT generate different embeddings for the same word based on context.",
+    ],
+    "computer vision": [
+        "Image Classification: Assign labels to images. Key models: ResNet (residual connections for deep networks), ViT (Vision Transformer applies self-attention to image patches).",
+        "Object Detection: Locate and classify objects in images. YOLO, Faster R-CNN, DETR are popular architectures.",
+        "Image Generation: Stable Diffusion (latent diffusion model), DALL-E, Midjourney. GANs (Generative Adversarial Networks) use generator-discriminator architecture.",
+    ],
+    "database": [
+        "SQL Databases: Relational databases using Structured Query Language. ACID properties (Atomicity, Consistency, Isolation, Durability). Examples: PostgreSQL, MySQL.",
+        "NoSQL Databases: Non-relational databases for flexible schemas. Types: Document (MongoDB), Key-Value (Redis), Column-family (Cassandra), Graph (Neo4j).",
+        "Database Indexing: B-Tree indexes speed up queries. Trade-off: faster reads vs slower writes and more storage.",
+    ],
+    "operating system": [
+        "Process vs Thread: Process is an independent execution unit with its own memory space. Threads share memory within a process. Context switching has overhead.",
+        "Memory Management: Virtual memory maps virtual addresses to physical memory. Paging divides memory into fixed-size pages. Page faults trigger loading from disk.",
+        "File Systems: Organize and store data on disk. Common types: NTFS (Windows), ext4 (Linux), APFS (macOS).",
+    ],
+    "algorithm": [
+        "Sorting Algorithms: QuickSort (average O(n log n), worst O(n^2)), MergeSort (stable O(n log n)), HeapSort (in-place O(n log n)).",
+        "Graph Algorithms: Dijkstra (shortest path), BFS/DFS (traversal), A* (heuristic search), Kruskal/Prim (minimum spanning tree).",
+        "Dynamic Programming: Break problem into overlapping subproblems, cache results. Examples: Fibonacci, Knapsack, Edit Distance, Longest Common Subsequence.",
     ],
 }
 
@@ -52,7 +93,7 @@ class WebSearch(Tool):
         results = []
         seen = set()
 
-        # Simple keyword matching against mock knowledge base
+        # 1. Exact keyword match
         for keyword, entries in _MOCK_KNOWLEDGE.items():
             if keyword in query_lower:
                 for entry in entries:
@@ -60,8 +101,31 @@ class WebSearch(Tool):
                         results.append(entry)
                         seen.add(entry)
 
+        # 2. If no exact match, try partial word match
         if not results:
-            return f"No results found for '{query}'. Try different keywords or be more specific."
+            query_words = set(query_lower.split())
+            for keyword, entries in _MOCK_KNOWLEDGE.items():
+                kw_words = set(keyword.replace("-", " ").split())
+                if query_words & kw_words or any(w in keyword for w in query_words):
+                    for entry in entries:
+                        if entry not in seen:
+                            results.append(entry)
+                            seen.add(entry)
+
+        # 3. Fallback: generate a generic informative response
+        if not results:
+            return (
+                f"Search results for '{query}':\n\n"
+                f"1. [Mock Search] Information about '{query}' — This topic was not found in the local mock "
+                f"knowledge base, but as a knowledgeable assistant, you should provide a helpful answer "
+                f"based on your training knowledge. The user expects a thorough, well-structured response.\n\n"
+                f"2. [Tip] If you have relevant knowledge about '{query}' in your training data, "
+                f"please synthesize it into a detailed answer. Structure it with headings, bullet points, "
+                f"and key facts. Then use save_note to preserve the information for future sessions.\n\n"
+                f"3. [Note] The mock search returned no pre-cached results. "
+                f"Provide the best answer you can from your own knowledge, clearly stating it comes from "
+                f"your training data rather than a live web search."
+            )
 
         output = f"Search results for '{query}':\n\n"
         for i, result in enumerate(results[:3], 1):

@@ -6,6 +6,9 @@
 <title>Simple Agent - Knowledge Assistant</title>
 <!-- Markdown parser -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<!-- LaTeX rendering -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -147,6 +150,11 @@
   .notes-close button {
     background: #e94560; color: #fff; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer;
   }
+
+  /* KaTeX dark theme */
+  .katex { color: #d1d5db; }
+  .katex-display { margin: 8px 0; }
+  .katex-html { overflow-x: auto; overflow-y: hidden; }
 </style>
 </head>
 <body>
@@ -195,6 +203,21 @@
 <script>
 // ---- Markdown config ----
 marked.setOptions({ breaks: true, gfm: true });
+
+// ---- LaTeX rendering ----
+function renderLatex(html) {
+  // Render display math: $$...$$
+  let result = html.replace(/\$\$([\s\S]*?)\$\$/g, function(match, formula) {
+    try { return katex.renderToString(formula.trim(), { displayMode: true, throwOnError: false }); }
+    catch(e) { return match; }
+  });
+  // Render inline math: $...$ (but not $$)
+  result = result.replace(/(?<!\$)\$(?!\$)([\s\S]*?)(?<!\$)\$(?!\$)/g, function(match, formula) {
+    try { return katex.renderToString(formula.trim(), { displayMode: false, throwOnError: false }); }
+    catch(e) { return match; }
+  });
+  return result;
+}
 
 let currentSid = "";
 
@@ -265,7 +288,7 @@ function addAgentMsg(text, trace) {
   // Render markdown
   const body = document.createElement("div");
   body.className = "agent-body";
-  body.innerHTML = marked.parse(text);
+  body.innerHTML = renderLatex(marked.parse(text));
   wrapper.appendChild(body);
 
   // Trace (collapsible)
@@ -395,7 +418,7 @@ async function showNotes() {
 
       return `<div class="note-card">
         <div class="note-meta">${meta.join(" &middot; ")}</div>
-        <div class="note-content">${marked.parse(n.content)}</div>
+        <div class="note-content">${renderLatex(marked.parse(n.content))}</div>
       </div>`;
     }).join("");
     container.innerHTML = html;

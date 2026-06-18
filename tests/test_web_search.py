@@ -18,9 +18,11 @@ class TestWebSearch:
         assert r1 != r2
 
     def test_search_no_results(self, search):
-        """Searching for something very specific returns a no-results message."""
+        """Searching for something with no match returns a fallback message."""
         result = search.execute(query="xyznonexistent12345")
-        assert "no result" in result.lower() or "not found" in result.lower() or "0 result" in result.lower()
+        # Should return fallback guidance, not empty
+        assert "xyznonexistent12345" in result
+        assert len(result) > 0
 
     def test_search_result_format(self, search):
         result = search.execute(query="Transformer architecture")
