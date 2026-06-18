@@ -312,9 +312,18 @@ function addAgentMsg(text, trace) {
       step.className = "trace-step";
       if (t.tool) {
         const args = Object.entries(t.args || {}).map(([k,v]) => `${k}=${JSON.stringify(v)}`).join(", ");
-        let resultHtml = escapeHtml((t.result || "").substring(0, 300));
-        if ((t.result || "").length > 300) resultHtml += "...";
-        step.innerHTML = `<span class="tool-name">Step ${t.step}: ${t.tool}</span><br>
+        let resultHtml = escapeHtml((t.result || "").substring(0, 500));
+        if ((t.result || "").length > 500) resultHtml += "...";
+
+        // Detect data source
+        let sourceBadge = "";
+        if (t.result && t.result.includes("[SOURCE: Local Database]")) {
+          sourceBadge = ` <span style="background:#4ecca3;color:#000;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:bold;">MOCK HIT</span>`;
+        } else if (t.result && t.result.includes("[SOURCE: LLM Knowledge]")) {
+          sourceBadge = ` <span style="background:#f0c040;color:#000;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:bold;">LLM KNOWLEDGE</span>`;
+        }
+
+        step.innerHTML = `<span class="tool-name">Step ${t.step}: ${t.tool}${sourceBadge}</span><br>
           <span class="tool-args">Args: ${escapeHtml(args)}</span><br>
           <span class="tool-result">Result: ${resultHtml}</span>`;
       } else if (t.action === "final_answer") {

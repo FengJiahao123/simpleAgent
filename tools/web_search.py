@@ -112,22 +112,16 @@ class WebSearch(Tool):
                             results.append(entry)
                             seen.add(entry)
 
-        # 3. Fallback: generate a generic informative response
+        # 3. Fallback: LLM must use its own training knowledge
         if not results:
             return (
-                f"Search results for '{query}':\n\n"
-                f"1. [Mock Search] Information about '{query}' — This topic was not found in the local mock "
-                f"knowledge base, but as a knowledgeable assistant, you should provide a helpful answer "
-                f"based on your training knowledge. The user expects a thorough, well-structured response.\n\n"
-                f"2. [Tip] If you have relevant knowledge about '{query}' in your training data, "
-                f"please synthesize it into a detailed answer. Structure it with headings, bullet points, "
-                f"and key facts. Then use save_note to preserve the information for future sessions.\n\n"
-                f"3. [Note] The mock search returned no pre-cached results. "
-                f"Provide the best answer you can from your own knowledge, clearly stating it comes from "
-                f"your training data rather than a live web search."
+                f"[SOURCE: LLM Knowledge] The search engine did not find '{query}' in the local index. "
+                f"You MUST answer from your own training data. "
+                f"IMPORTANT: Clearly tell the user this response comes from your training knowledge (not a live search), "
+                f"and suggest trying different search keywords or saving findings with save_note for future reference."
             )
 
-        output = f"Search results for '{query}':\n\n"
+        output = f"[SOURCE: Local Database] Results for '{query}' (found {len(results[:3])} entries):\n\n"
         for i, result in enumerate(results[:3], 1):
             output += f"{i}. {result}\n"
         return output.strip()
