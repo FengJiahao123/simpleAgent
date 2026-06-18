@@ -61,10 +61,11 @@ Agent Runtime (agent/runtime.py)
     +-- LLM Client (agent/llm_client.py) -> DeepSeek API
     +-- Tool Registry (agent/tool_registry.py)
     |   +-- Calculator (tools/calculator.py)
-    |   +-- WebSearch (tools/web_search.py)
+    |   +-- WebSearch (tools/web_search.py)   [real search via Baidu]
     |   +-- SaveNote / SearchNotes (tools/notes.py)
     |   +-- Summarize (tools/summarize.py)
     |   +-- Translate (tools/translate.py)
+    |   +-- ExportDoc (tools/export_doc.py)
     +-- Session Manager (session/manager.py)
         +-- data/sessions/<id>.json
 ```
@@ -89,12 +90,13 @@ User Input
 
 | Tool | Description |
 |------|-------------|
-| `web_search` | Search the web (mock knowledge base, extensible to real API) |
-| `save_note` | Save knowledge to long-term memory |
-| `search_notes` | Search existing notes by keyword |
+| `web_search` | Real web search via Baidu — returns titles, snippets, and source URLs |
+| `save_note` | Save structured knowledge notes to long-term memory |
+| `search_notes` | Search existing notes by keyword (returns full content) |
 | `summarize` | Summarize text via LLM (with extractive fallback) |
 | `calculator` | Safe math expression evaluation |
 | `translate` | Translate text via LLM (with fallback) |
+| `export_doc` | Export notes/results as files: md (default), docx, txt, html |
 
 ## Memory Mechanism
 
@@ -158,14 +160,22 @@ simpleAgent/
 ├── tools/
 │   ├── base.py             # Tool ABC + data types (Note, Session)
 │   ├── calculator.py       # Safe math calculator
-│   ├── web_search.py       # Web search (mock knowledge base)
+│   ├── web_search.py       # Web search (real Baidu search)
 │   ├── notes.py            # save_note + search_notes
 │   ├── summarize.py        # LLM text summarizer
-│   └── translate.py        # LLM translator
+│   ├── translate.py        # LLM translator
+│   └── export_doc.py       # Export to md/docx/txt/html
 ├── session/
 │   └── manager.py          # Session persistence & note retrieval
-├── data/sessions/          # Session persistence directory
-└── tests/                  # Test suite (62 tests)
+├── templates/
+│   ├── index.html          # Web chat UI
+│   └── notes.html          # Notes viewer page
+├── web.py                  # Flask web server
+├── data/                   # Persistence directories
+│   ├── sessions/
+│   ├── notes/
+│   └── exports/
+└── tests/                  # Test suite (72 tests)
     ├── test_tool_base.py
     ├── test_calculator.py
     ├── test_web_search.py
@@ -176,7 +186,8 @@ simpleAgent/
     ├── test_llm_client.py
     ├── test_session_manager.py
     ├── test_runtime.py
-    └── test_integration.py
+    ├── test_integration.py
+    └── test_export_doc.py
 ```
 
 ## Design Decisions
