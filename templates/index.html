@@ -295,7 +295,7 @@ function addAgentMsg(text, trace) {
   if (trace && trace.length > 0) {
     const toggle = document.createElement("span");
     toggle.className = "trace-toggle";
-    toggle.textContent = " Show trace (" + trace.length + " step(s))";
+    toggle.textContent = " Hide trace";
     toggle.onclick = function() {
       const tb = this.nextElementSibling;
       const open = tb.classList.toggle("open");
@@ -306,7 +306,7 @@ function addAgentMsg(text, trace) {
     wrapper.appendChild(toggle);
 
     const tb = document.createElement("div");
-    tb.className = "trace-block";
+    tb.className = "trace-block open";
     trace.forEach((t, i) => {
       const step = document.createElement("div");
       step.className = "trace-step";

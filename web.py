@@ -139,6 +139,9 @@ def chat():
                 "tool": t.get("tool", ""),
                 "args": t.get("args", {}),
                 "result": t.get("result", ""),
+                "action": t.get("action", ""),
+                "content": t.get("content", ""),
+                "error": t.get("error", ""),
             }
             for t in result.trace
         ],
