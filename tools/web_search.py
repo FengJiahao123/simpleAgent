@@ -1,110 +1,101 @@
 from tools.base import Tool
 
-# Mock knowledge base
-_MOCK_KNOWLEDGE = {
-    "python": [
-        "Python Official Documentation — Comprehensive guide to Python language features, standard library, and best practices.",
-        "Python 3.12 Release Notes — New features include improved error messages, type parameter syntax, and performance enhancements.",
-        "Real Python Tutorials — Hands-on Python tutorials covering web development, data science, automation, and more.",
-    ],
-    "machine learning": [
-        "Scikit-learn User Guide — Covers supervised and unsupervised learning algorithms with practical examples.",
-        "Deep Learning with PyTorch — Official PyTorch tutorials for building neural networks, from MLPs to Transformers.",
-        "MLOps Best Practices — Guide to deploying and maintaining ML models in production environments.",
-    ],
+# Fallback knowledge for when network is unavailable
+_FALLBACK_KNOWLEDGE = {
     "transformer": [
         "Attention Is All You Need (Vaswani et al., 2017) — The original Transformer paper introducing self-attention mechanism.",
-        "Transformer architecture: Encoder-decoder structure. Self-Attention formula: Attention(Q,K,V) = softmax(QK^T/sqrt(d_k))V. Multi-Head Attention runs h parallel attention heads, each with dimension d_k = d_model/h. Positional Encoding uses sine/cosine functions. Layer Normalization and Residual Connections after each sub-layer.",
-        "The Illustrated Transformer by Jay Alammar — Visual guide explaining Transformer architecture step by step.",
-    ],
-    "attention": [
-        "Self-Attention mechanism: Given input sequence X, compute Query=W_Q·X, Key=W_K·X, Value=W_V·X. Output is weighted sum of Values, weights determined by softmax(QK^T / sqrt(d_k)). Multiple heads capture different subspace relationships.",
-        "Multi-Head Attention: Concat(head_1, ..., head_h)W_O where each head_i = Attention(Q·W_i^Q, K·W_i^K, V·W_i^V). Typical values: h=8, d_k=d_model/h=64.",
-        "FlashAttention (Dao et al., 2022) — IO-aware attention algorithm achieving 2-4x speedup by reducing memory reads/writes.",
+        "Transformer architecture: Encoder-decoder with Self-Attention. Formula: Attention(Q,K,V)=softmax(QK^T/sqrt(d_k))V. Multi-Head Attention with h parallel heads, d_k=d_model/h.",
+        "The Illustrated Transformer by Jay Alammar — Visual explanation of Transformer internals.",
     ],
     "deep learning": [
-        "Neural Networks: Layers of neurons with activation functions (ReLU, sigmoid, tanh). Training via backpropagation and gradient descent.",
-        "CNN (Convolutional Neural Networks): Specialized for grid-like data. Uses convolution, pooling, and fully-connected layers. Key architectures: ResNet, VGG, Inception.",
-        "RNN/LSTM/GRU: Recurrent architectures for sequential data. LSTM uses forget/input/output gates to control information flow. GRU is a simplified variant with 2 gates.",
-    ],
-    "web development": [
-        "MDN Web Docs — Mozilla's comprehensive reference for HTML, CSS, and JavaScript APIs.",
-        "React Official Documentation — Guides for building user interfaces with React components and hooks.",
-        "Flask Web Framework — Lightweight Python web framework for building APIs and web applications.",
-    ],
-    "deepseek": [
-        "DeepSeek-V3 — A strong Mixture-of-Experts (MoE) language model with 671B total parameters, 37B activated per token. Supports 128K context window.",
-        "DeepSeek-R1 — Reasoning model that uses reinforcement learning to improve chain-of-thought reasoning capabilities.",
-    ],
-    "language model": [
-        "Large Language Models (LLMs): Transformer-based models trained on massive text corpora. Key examples: GPT-4, Claude, DeepSeek, LLaMA, Gemini.",
-        "LLM Training Process: Pre-training (next-token prediction on web-scale data) → Supervised Fine-Tuning (instruction following) → RLHF/DPO (alignment with human preferences).",
-        "Scaling Laws: Model performance improves predictably with more compute, data, and parameters (Kaplan et al., 2020; Chinchilla, 2022).",
-    ],
-    "reinforcement learning": [
-        "Reinforcement Learning: Agent learns by interacting with environment, receiving rewards for good actions. Key concepts: state, action, reward, policy, value function.",
-        "RLHF (Reinforcement Learning from Human Feedback): Train a reward model from human preference data, then optimize LLM policy via PPO against the reward model.",
-        "Key Algorithms: Q-Learning, Policy Gradient, Actor-Critic (A2C/A3C), PPO, DQN, SAC.",
+        "Deep Learning (Goodfellow, Bengio & Courville, 2016) — The definitive textbook on deep learning fundamentals.",
+        "Neural Networks: Layers of neurons with activation functions (ReLU, sigmoid). Training via backpropagation and gradient descent.",
+        "ResNet (He et al., 2015) — Residual connections enable training of very deep networks (152+ layers).",
     ],
     "natural language processing": [
-        "NLP Pipeline: Tokenization → Embedding → Encoding → Task-specific head. Modern approach uses pre-trained Transformer models fine-tuned for downstream tasks.",
-        "Key NLP Tasks: Text classification, named entity recognition (NER), question answering, machine translation, summarization, sentiment analysis.",
-        "Word Embeddings: Word2Vec, GloVe. Modern contextual embeddings: BERT, GPT generate different embeddings for the same word based on context.",
+        "BERT (Devlin et al., 2018) — Bidirectional transformer pre-training for language understanding.",
+        "GPT Series: GPT-3 (Brown et al., 2020) showed emergent few-shot learning. GPT-4 extended to multimodal.",
+    ],
+    "reinforcement learning": [
+        "RLHF (Christiano et al., 2017 / Ouyang et al., 2022) — Aligning language models with human preferences.",
+        "PPO (Schulman et al., 2017) — Proximal Policy Optimization, the standard RL algorithm for LLM alignment.",
     ],
     "computer vision": [
-        "Image Classification: Assign labels to images. Key models: ResNet (residual connections for deep networks), ViT (Vision Transformer applies self-attention to image patches).",
-        "Object Detection: Locate and classify objects in images. YOLO, Faster R-CNN, DETR are popular architectures.",
-        "Image Generation: Stable Diffusion (latent diffusion model), DALL-E, Midjourney. GANs (Generative Adversarial Networks) use generator-discriminator architecture.",
+        "ViT (Dosovitskiy et al., 2020) — Vision Transformer: apply self-attention to image patches.",
+        "Stable Diffusion (Rombach et al., 2022) — Latent diffusion model for high-quality image generation.",
+    ],
+    "python": [
+        "Python 3.12 Release Notes — New features: improved f-strings, type parameter syntax, perf improvements.",
+        "Real Python Tutorials — Comprehensive guides on web dev, data science, automation with Python.",
     ],
     "database": [
-        "SQL Databases: Relational databases using Structured Query Language. ACID properties (Atomicity, Consistency, Isolation, Durability). Examples: PostgreSQL, MySQL.",
-        "NoSQL Databases: Non-relational databases for flexible schemas. Types: Document (MongoDB), Key-Value (Redis), Column-family (Cassandra), Graph (Neo4j).",
-        "Database Indexing: B-Tree indexes speed up queries. Trade-off: faster reads vs slower writes and more storage.",
-    ],
-    "operating system": [
-        "Process vs Thread: Process is an independent execution unit with its own memory space. Threads share memory within a process. Context switching has overhead.",
-        "Memory Management: Virtual memory maps virtual addresses to physical memory. Paging divides memory into fixed-size pages. Page faults trigger loading from disk.",
-        "File Systems: Organize and store data on disk. Common types: NTFS (Windows), ext4 (Linux), APFS (macOS).",
-    ],
-    "algorithm": [
-        "Sorting Algorithms: QuickSort (average O(n log n), worst O(n^2)), MergeSort (stable O(n log n)), HeapSort (in-place O(n log n)).",
-        "Graph Algorithms: Dijkstra (shortest path), BFS/DFS (traversal), A* (heuristic search), Kruskal/Prim (minimum spanning tree).",
-        "Dynamic Programming: Break problem into overlapping subproblems, cache results. Examples: Fibonacci, Knapsack, Edit Distance, Longest Common Subsequence.",
+        "PostgreSQL Documentation — ACID-compliant relational database with advanced features.",
+        "MongoDB Manual — Document-oriented NoSQL database with flexible schema and aggregation pipeline.",
     ],
 }
 
 
 class WebSearch(Tool):
     name = "web_search"
-    description = "Search the web for information on a given topic. Returns up to 3 relevant results."
+    description = (
+        "Search the web for REAL, up-to-date information. Returns titles, URLs, and snippets. "
+        "This performs an actual internet search — use it to find facts, articles, documentation, "
+        "and current information. Always cite the source URL in your response."
+    )
     parameters = {
         "type": "object",
         "properties": {
             "query": {
                 "type": "string",
-                "description": "The search query or topic to look up."
+                "description": "The search query."
             }
         },
         "required": ["query"]
     }
 
     def execute(self, query: str, **kwargs) -> str:
+        # Try real search first
+        try:
+            return self._duckduckgo_search(query)
+        except Exception:
+            pass
+
+        # Fallback to local knowledge
+        return self._fallback_search(query)
+
+    def _duckduckgo_search(self, query: str) -> str:
+        from duckduckgo_search import DDGS
+
+        with DDGS() as ddgs:
+            results = list(ddgs.text(query, max_results=5))
+
+        if not results:
+            return self._fallback_search(query)
+
+        output = f"[SOURCE: Real Web Search] Results for '{query}':\n\n"
+        for i, r in enumerate(results, 1):
+            output += f"{i}. {r.get('title', 'No title')}\n"
+            output += f"   {r.get('body', '')[:300]}\n"
+            output += f"   URL: {r.get('href', 'N/A')}\n\n"
+        return output.strip()
+
+    def _fallback_search(self, query: str) -> str:
+        """Use local fallback knowledge if network is unavailable."""
         query_lower = query.lower().strip()
         results = []
         seen = set()
 
-        # 1. Exact keyword match
-        for keyword, entries in _MOCK_KNOWLEDGE.items():
+        for keyword, entries in _FALLBACK_KNOWLEDGE.items():
             if keyword in query_lower:
                 for entry in entries:
                     if entry not in seen:
                         results.append(entry)
                         seen.add(entry)
 
-        # 2. If no exact match, try partial word match
         if not results:
+            # Partial word match
             query_words = set(query_lower.split())
-            for keyword, entries in _MOCK_KNOWLEDGE.items():
+            for keyword, entries in _FALLBACK_KNOWLEDGE.items():
                 kw_words = set(keyword.replace("-", " ").split())
                 if query_words & kw_words or any(w in keyword for w in query_words):
                     for entry in entries:
@@ -112,16 +103,14 @@ class WebSearch(Tool):
                             results.append(entry)
                             seen.add(entry)
 
-        # 3. Fallback: LLM must use its own training knowledge
         if not results:
             return (
-                f"[SOURCE: LLM Knowledge] The search engine did not find '{query}' in the local index. "
-                f"You MUST answer from your own training data. "
-                f"IMPORTANT: Clearly tell the user this response comes from your training knowledge (not a live search), "
-                f"and suggest trying different search keywords or saving findings with save_note for future reference."
+                f"[SOURCE: LLM Knowledge] No results found for '{query}' — "
+                f"network unavailable and topic not in local cache. "
+                f"Answer from your training data and clearly tell the user this is not a live search result."
             )
 
-        output = f"[SOURCE: Local Database] Results for '{query}' (found {len(results[:3])} entries):\n\n"
-        for i, result in enumerate(results[:3], 1):
-            output += f"{i}. {result}\n"
+        output = f"[SOURCE: Local Cache (offline)] Results for '{query}':\n\n"
+        for i, r in enumerate(results[:3], 1):
+            output += f"{i}. {r}\n"
         return output.strip()

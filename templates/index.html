@@ -317,10 +317,12 @@ function addAgentMsg(text, trace) {
 
         // Detect data source
         let sourceBadge = "";
-        if (t.result && t.result.includes("[SOURCE: Local Database]")) {
-          sourceBadge = ` <span style="background:#4ecca3;color:#000;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:bold;">MOCK HIT</span>`;
+        if (t.result && t.result.includes("[SOURCE: Real Web Search]")) {
+          sourceBadge = ` <span style="background:#4ecca3;color:#000;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:bold;">WEB</span>`;
+        } else if (t.result && t.result.includes("[SOURCE: Local Cache")) {
+          sourceBadge = ` <span style="background:#f0c040;color:#000;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:bold;">OFFLINE</span>`;
         } else if (t.result && t.result.includes("[SOURCE: LLM Knowledge]")) {
-          sourceBadge = ` <span style="background:#f0c040;color:#000;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:bold;">LLM KNOWLEDGE</span>`;
+          sourceBadge = ` <span style="background:#e94560;color:#fff;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:bold;">LLM</span>`;
         }
 
         step.innerHTML = `<span class="tool-name">Step ${t.step}: ${t.tool}${sourceBadge}</span><br>
