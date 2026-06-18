@@ -3,28 +3,14 @@ from tools.translate import Translate
 
 
 class FakeLLMForTranslate:
-    """Fake LLM client that echoes back with a translation marker."""
+    """Fake LLM client that returns a message object (matching LLMClient.chat())."""
     def chat(self, messages, tools=None):
         class Message:
             pass
-
-        class Choice:
-            pass
-
-        class Response:
-            pass
-
         msg = Message()
         msg.content = "[Translated] Hello, world!"
         msg.tool_calls = None
-
-        choice = Choice()
-        choice.message = msg
-
-        response = Response()
-        response.choices = [choice]
-
-        return response
+        return msg
 
 
 class TestTranslate:

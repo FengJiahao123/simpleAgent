@@ -3,28 +3,14 @@ from tools.summarize import Summarize
 
 
 class FakeLLMForSummarize:
-    """Fake LLM client that returns a short summary."""
+    """Fake LLM client that returns a message object (matching LLMClient.chat())."""
     def chat(self, messages, tools=None):
         class Message:
             pass
-
-        class Choice:
-            pass
-
-        class Response:
-            pass
-
         msg = Message()
         msg.content = "This is a summarized version of the input text."
         msg.tool_calls = None
-
-        choice = Choice()
-        choice.message = msg
-
-        response = Response()
-        response.choices = [choice]
-
-        return response
+        return msg
 
 
 class TestSummarize:

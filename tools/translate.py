@@ -37,4 +37,4 @@ class Translate(Tool):
             {"role": "user", "content": text},
         ]
         response = self._llm_client.chat(messages)
-        return response.choices[0].message.content
+        return response.content or f"[Translation failed — no output]"
