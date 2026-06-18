@@ -11,3 +11,4 @@ data/exports/*
 .pytest_cache/
 .idea/
 TESTING_GUIDE.md
+RECORDING_GUIDE.md
