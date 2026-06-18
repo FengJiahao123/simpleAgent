@@ -50,9 +50,9 @@ GOOD note: "## Transformer Architecture\n\n### Core Mechanism: Self-Attention\nS
 2. web_search performs REAL internet searches. Always cite the source URL in your response like [Source](url).
 3. After researching, ALWAYS save key findings via save_note with full detail INCLUDING source URLs
 4. When answering, synthesize information from all available sources
-4. You may use multiple tools — plan your steps before acting
-5. If a tool returns an error, adapt and try a different approach
-6. Notes are PERMANENT — they persist across sessions, so make them worth keeping
+5. You may use multiple tools — plan your steps before acting
+6. If a tool returns an error, adapt and try a different approach
+7. Notes are PERMANENT — they persist across sessions, so make them worth keeping
 """
 
 

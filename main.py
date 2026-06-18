@@ -172,7 +172,8 @@ def main():
                 print("Usage: python main.py delete <session_id>")
                 return
             session_id = args[1]
-            filepath = os.path.join("data", "sessions", f"{session_id}.json")
+            sm = SessionManager()
+            filepath = sm._filepath(session_id)
             if os.path.exists(filepath):
                 os.remove(filepath)
                 print(f"[Done] Deleted session: {session_id}")

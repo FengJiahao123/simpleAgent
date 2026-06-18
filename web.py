@@ -13,6 +13,7 @@ from agent.llm_client import LLMClient
 from agent.tool_registry import ToolRegistry
 from agent.runtime import AgentRuntime
 from session.manager import SessionManager
+from tools.base import Session
 from tools.calculator import Calculator
 from tools.web_search import WebSearch
 from tools.notes import SaveNote, SearchNotes, export_all_notes_to_md, NOTES_DIR
@@ -25,7 +26,13 @@ app.secret_key = os.urandom(24)
 
 # ---- Global components ----
 
-llm_client = LLMClient()
+try:
+    llm_client = LLMClient()
+except ValueError as e:
+    print(f"[ERROR] {e}")
+    print("   Create a .env file in the project root with: DEEPSEEK_API_KEY=sk-...")
+    import sys
+    sys.exit(1)
 registry = ToolRegistry()
 registry.register(Calculator())
 registry.register(WebSearch())
@@ -37,7 +44,7 @@ registry.register(ExportDoc())
 session_manager = SessionManager()
 runtime = AgentRuntime(llm_client=llm_client, tool_registry=registry, max_steps=10)
 
-active_sessions: dict[str, object] = {}
+active_sessions: dict[str, Session] = {}
 
 
 # ---- Page Routes ----

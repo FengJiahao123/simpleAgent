@@ -12,7 +12,7 @@ class Summarize(Tool):
                 "description": "The text to summarize."
             },
             "max_length": {
-                "type": "string",
+                "type": "integer",
                 "description": "Optional maximum length of the summary in characters. Default is 200."
             }
         },
@@ -22,10 +22,10 @@ class Summarize(Tool):
     def __init__(self, llm_client=None):
         self._llm_client = llm_client
 
-    def execute(self, text: str, max_length: str = "200", **kwargs) -> str:
+    def execute(self, text: str, max_length: int | str = 200, **kwargs) -> str:
         if self._llm_client is None:
             # Fallback: simple extractive summary (first N chars + last sentence)
-            max_len = int(max_length) if max_length.isdigit() else 200
+            max_len = int(max_length) if str(max_length).isdigit() else 200
             if len(text) <= max_len:
                 return text
             summary = text[:max_len].rsplit(".", 1)[0] + "."

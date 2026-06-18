@@ -20,6 +20,7 @@ from tools.web_search import WebSearch
 from tools.notes import SaveNote, SearchNotes
 from tools.summarize import Summarize
 from tools.translate import Translate
+from tools.export_doc import ExportDoc
 
 
 def setup():
@@ -31,6 +32,7 @@ def setup():
     registry.register(SearchNotes())
     registry.register(Summarize(llm_client=llm))
     registry.register(Translate(llm_client=llm))
+    registry.register(ExportDoc())
     sm = SessionManager()
     runtime = AgentRuntime(llm_client=llm, tool_registry=registry, max_steps=10)
     return runtime, sm
