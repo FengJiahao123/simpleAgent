@@ -4,6 +4,14 @@
 
 ---
 
+## 演示视频
+
+[![Simple Agent 演示视频](https://img.shields.io/badge/Bilibili-演示视频-00A1D6?logo=bilibili)](https://b23.tv/qgW9kf6)
+
+点击上方链接或访问：https://b23.tv/qgW9kf6
+
+---
+
 ## 一、运行方式
 
 ### 1. 环境准备
